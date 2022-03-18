@@ -1,11 +1,19 @@
 import pytz
+from django.core.validators import RegexValidator
 from django.db import models
 
 
 class Operator(models.Model):
     """Мобильный оператор"""
-    code = models.IntegerField(
+    error_message = "Код оператора должен быть в формате XXX," \
+                    " где X - цифра от 0 до 9"
+    code_validator = RegexValidator(
+        regex=r"^\d{3}$",
+        message=error_message,
+    )
+    code = models.CharField(
         max_length=3,
+        validators=[code_validator],
         primary_key=True,
         verbose_name="код мобильного оператора",
     )
@@ -26,7 +34,7 @@ class Maillist(models.Model):
         null=False,
         verbose_name="начало рассылки",
     )
-    message = models.TextField(
+    text = models.TextField(
         null=False,
         verbose_name="сообщение",
     )
@@ -50,11 +58,19 @@ class Maillist(models.Model):
 
 class Client(models.Model):
     """Клиент"""
-    phone_number = models.IntegerField(
+    error_message = "Номер телефона должен быть в формате 7XXXXXXXXXX," \
+                    " где X - цифра от 0 до 9"
+    phone_validator = RegexValidator(
+        regex=r"^7\d{10}$",
+        message=error_message,
+    )
+    phone_number = models.CharField(
         max_length=11,
+        validators=[phone_validator],
         null=False,
         verbose_name="номер телефона",
     )
+
     operator_code = models.ForeignKey(
         Operator,
         null=False,
