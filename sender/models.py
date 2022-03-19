@@ -18,6 +18,9 @@ class Operator(models.Model):
         verbose_name="код мобильного оператора",
     )
 
+    def __str__(self):
+        return str(self.code)
+
 
 class Tag(models.Model):
     """Тег"""
@@ -26,6 +29,9 @@ class Tag(models.Model):
         primary_key=True,
         verbose_name="тег",
     )
+
+    def __str__(self):
+        return self.name
 
 
 class Maillist(models.Model):
@@ -56,7 +62,7 @@ class Maillist(models.Model):
     )
 
 
-class Client(models.Model):
+class Customer(models.Model):
     """Клиент"""
     error_message = "Номер телефона должен быть в формате 7XXXXXXXXXX," \
                     " где X - цифра от 0 до 9"
@@ -79,7 +85,7 @@ class Client(models.Model):
     )
     tag = models.ForeignKey(
         Tag,
-        null=False,
+        null=True,
         on_delete=models.CASCADE,
         verbose_name="тег",
     )
@@ -120,8 +126,8 @@ class Message(models.Model):
         on_delete=models.CASCADE,
         verbose_name="рассылка",
     )
-    client = models.ForeignKey(
-        Client,
+    customer = models.ForeignKey(
+        Customer,
         null=False,
         on_delete=models.CASCADE,
         verbose_name="клиент",
