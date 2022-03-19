@@ -1,3 +1,6 @@
 django
+django-extensions
 djangorestframework
+pytest
+pytest-django
 requests
