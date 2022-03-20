@@ -100,24 +100,16 @@ class Customer(models.Model):
     )
 
 
-class Status(models.Model):
-    text = models.CharField(
-        max_length=20,
-        primary_key=True,
-        verbose_name="статус"
-    )
-
-
 class Message(models.Model):
     """Сообщение"""
     created_at = models.DateTimeField(
         null=False,
+        auto_now_add=True,
         verbose_name="время создания (отправки)",
     )
-    status = models.ForeignKey(
-        Status,
+    status = models.CharField(
+        max_length=20,
         null=False,
-        on_delete=models.CASCADE,
         verbose_name="статус",
     )
     maillist = models.ForeignKey(
