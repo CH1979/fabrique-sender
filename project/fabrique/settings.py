@@ -21,12 +21,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+with open(os.environ.get("SECRET_KEY")) as f:
+    SECRET_KEY = f.read()
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = int(os.environ.get("DEBUG", default=0))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
 
 # Application definition
@@ -39,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'django_extensions',
+    # 'django_extensions',
     'sender.apps.SenderConfig',
 ]
 
@@ -127,8 +128,11 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Fabrique probe server settings
-PROBE_SERVER_URL = os.environ.get("PROBE_SERVER_URL")
-TOKEN = os.environ.get("PROBE_SERVER_TOKEN")
+with open(os.environ.get("PROBE_SERVER_URL")) as f:
+    PROBE_SERVER_URL = f.read()
+
+with open(os.environ.get("PROBE_SERVER_TOKEN")) as f:
+    TOKEN = f.read()
 
 # Celery
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")

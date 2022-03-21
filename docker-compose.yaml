@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  web:
+    build: ./project
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./project:/usr/src/app/
+    ports:
+      - 1337:8000
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=/run/secrets/django_secret_key
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+      - PROBE_SERVER_URL=/run/secrets/probe_server_url
+      - PROBE_SERVER_TOKEN=/run/secrets/probe_server_token
+    depends_on:
+      - redis
+    secrets:
+      - django_secret_key
+      - probe_server_url
+      - probe_server_token
+
+  celery:
+    build: ./project
+    command: celery worker --app=fabrique --loglevel=info --logfile=logs/celery.log
+    volumes:
+      - ./project:/usr/src/app
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=/run/secrets/django_secret_key
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+      - PROBE_SERVER_URL=/run/secrets/probe_server_url
+      - PROBE_SERVER_TOKEN=/run/secrets/probe_server_token
+    depends_on:
+      - web
+      - redis
+    secrets:
+      - django_secret_key
+      - probe_server_token
+      - probe_server_url
+
+  redis:
+    image: redis:6-alpine
+
+  dashboard:
+    build: ./project
+    command:  flower -A fabrique --port=5555 --broker=redis://redis:6379/0
+    ports:
+      - 5555:5555
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=/run/secrets/django_secret_key
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+      - PROBE_SERVER_URL=/run/secrets/probe_server_url
+      - PROBE_SERVER_TOKEN=/run/secrets/probe_server_token
+    depends_on:
+      - web
+      - redis
+      - celery
+    secrets:
+      - django_secret_key
+      - probe_server_token
+      - probe_server_url
+
+secrets:
+  django_secret_key:
+    file: django_secret_key.txt
+  probe_server_url:
+    file: probe_server_url.txt
+  probe_server_token:
+    file: probe_server_token.txt

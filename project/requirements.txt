@@ -1,6 +1,7 @@
 celery==4.4.7
 Django==3.2.4
 djangorestframework
+flower==0.9.7
 redis==3.5.3
 requests==2.27.1
 
