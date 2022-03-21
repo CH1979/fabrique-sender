@@ -61,6 +61,9 @@ class Maillist(models.Model):
         verbose_name="окончание рассылки",
     )
 
+    def __str__(self):
+        return f"{self.start_at} - {self.operator_code} - {self.tag}"
+
 
 class Customer(models.Model):
     """Клиент"""
@@ -99,6 +102,9 @@ class Customer(models.Model):
         verbose_name="часовой пояс",
     )
 
+    def __str__(self):
+        return f"{self.phone_number} - {self.tag}"
+
 
 class Message(models.Model):
     """Сообщение"""
@@ -117,6 +123,7 @@ class Message(models.Model):
         null=False,
         on_delete=models.CASCADE,
         verbose_name="рассылка",
+        related_name="messages",
     )
     customer = models.ForeignKey(
         Customer,
@@ -124,3 +131,6 @@ class Message(models.Model):
         on_delete=models.CASCADE,
         verbose_name="клиент",
     )
+
+    def __str__(self):
+        return f"{self.id} - {self.created_at} - {self.status}"
