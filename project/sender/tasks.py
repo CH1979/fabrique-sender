@@ -11,6 +11,9 @@ from sender.models import Customer, Maillist, Message
 
 @app.task
 def start_maillist(maillist_id):
+    """
+    Запуск рассылки
+    """
     maillist = Maillist.objects.get(id=maillist_id)
     op_code = maillist.operator_code
     tag = maillist.tag
@@ -31,6 +34,9 @@ def start_maillist(maillist_id):
 
 @app.task
 def send_message(msg_id, phone, text):
+    """
+    Отправка сообщения
+    """
     url = "{}/send/{}".format(PROBE_SERVER_URL, msg_id)
     data = {
         "id": msg_id,

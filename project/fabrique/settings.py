@@ -13,7 +13,19 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 import os
 from pathlib import Path
 
+
+def get_secret(key, default):
+    """
+    Get secret from file with filename from environment variable.
+    """
+    value = os.getenv(key, default)
+    if os.path.isfile(value):
+        with open(value) as f:
+            return f.read()
+    return value
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -21,13 +33,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-with open(os.environ.get("SECRET_KEY")) as f:
-    SECRET_KEY = f.read()
+
+SECRET_KEY = get_secret(
+    "SECRET_KEY",
+    "cgvw%5vklmn3_7vl24l21pk(k%mp!px*&k3(e%vryz_7mbm2w3"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = int(os.environ.get("DEBUG", default=0))
 
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+DEBUG = bool(os.environ.get("DEBUG", default=0))
+
+value = os.getenv("DJANGO_ALLOWED_HOSTS", None)
+if value is not None:
+    ALLOWED_HOSTS = value.split(" ")
+else:
+    ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -59,7 +79,7 @@ ROOT_URLCONF = 'fabrique.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [], # [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -127,13 +147,14 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Fabrique probe server settings
-with open(os.environ.get("PROBE_SERVER_URL")) as f:
-    PROBE_SERVER_URL = f.read()
+# Probe server settings
 
-with open(os.environ.get("PROBE_SERVER_TOKEN")) as f:
-    TOKEN = f.read()
+PROBE_SERVER_URL = get_secret("PROBE_SERVER_URL", "127.0.0.1")
+
+TOKEN = get_secret("PROBE_SERVER_TOKEN", "")
 
 # Celery
+
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
-CELERY_RESULT_BACKEND = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
+
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://redis:6379/0")

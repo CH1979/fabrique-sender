@@ -4,4 +4,6 @@ django-extensions
 djangorestframework
 pytest
 pytest-django
+pyyaml
 requests
+uritemplate
