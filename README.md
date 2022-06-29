@@ -4,7 +4,7 @@
 Для запуска
 * Клонировать репозиторий командой:
 
-`git clone https://gitlab.com/donetskdev/fabrique.git`
+`git clone https://github.com/CH1979/fabrique-sender`
 * Сoздать в директории с репозиторием файлы:
 
 `django_secret_key.txt`
